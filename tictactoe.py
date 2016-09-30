@@ -31,8 +31,10 @@ def current_user(count):
         even, user2's turn. """
 
     if count % 2 != 0:
+        print "Player X, it's your turn"
         return "X"
     else: 
+        print "Player O, it's your turn"
         return "O"
 
 def is_winner(count, board):
