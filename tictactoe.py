@@ -1,3 +1,9 @@
+import os
+from flask import Flask, request, Response
+app = Flask(__name__)
+
+SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
+
 def play_tictactoe():
     board = get_new_board()
     move_count = 1 
@@ -10,7 +16,7 @@ def play_tictactoe():
         if isinstance(board[input1], int):
             board[input1] = current_symbol(move_count)
             show_board(board)
-            if is_winner(move_count, board) is True:
+            if is_winner(current_symbol(move_count), board) is True:
                 break
             move_count += 1 
         elif isinstance(board[input1], str):
@@ -72,7 +78,8 @@ def current_user(move_count):
     return "Player " + current_symbol(move_count)
 
 
-def is_winner(move_count, board):
+def is_winner(symbol, board):
+    """ Checks if the new entry on the board is a winner """
     wins = [[0, 1, 2],
             [3, 4, 5],
             [6, 7, 8],
@@ -82,10 +89,10 @@ def is_winner(move_count, board):
             [0, 4, 8],
             [2, 4, 6]]
     for win in wins:
-        if (board[win[0]] == current_symbol(move_count) and
-            board[win[1]] == current_symbol(move_count) and
-            board[win[2]] == current_symbol(move_count)):
-            print "~`~`~`~`~",current_user(move_count), " winsss!!~`~`~`~`~"
+        if (board[win[0]] == symbol and
+            board[win[1]] == symbol and
+            board[win[2]] == symbol):
+            print "~`~`~`~`~ Player", symbol, " winsss!!~`~`~`~`~"
             return True
         else:
             continue
