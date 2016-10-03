@@ -1,8 +1,37 @@
 import os
 from flask import Flask, request, Response
+from slackclient import SlackClient
 app = Flask(__name__)
 
 SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
+SLACK_TEST_TOKEN = os.environ.get('SLACK_TEST_TOKEN')
+SLACK_SLASH_TOKEN = os.environ.get('SLACK_SLASH_TOKEN')
+
+
+@app.route('/slack', methods=['POST'])
+def inbound():
+    """ Manages requests from the Slack channel"""
+    if request.form.get('token') == SLACK_SLASH_TOKEN:
+        channel = request.form.get('channel_name')
+        username = request.form.get('user_name')
+        text = request.form.get('text')
+        inbound_message = username + " in " + channel + " says: " + text
+        print(inbound_message)
+        test_chatmsg(channel, username)
+    return show_board(get_new_board())
+
+
+@app.route('/', methods=['GET'])
+def test():
+    return Response('It works!')
+
+
+def test_chatmsg(channel, username):
+    sc = SlackClient(SLACK_TEST_TOKEN)
+    msg = show_board(get_new_board())
+    return sc.api_call("chat.postMessage", as_user='false', channel=channel, text=msg)
+
+
 
 def play_tictactoe():
     board = get_new_board()
@@ -32,20 +61,26 @@ def play_tictactoe():
 
 def get_new_board():
     """ Sets up a new board for 1 game """
-    return  [1, 2, 3,
+    return  [1, "X", 3,
              4, 5, 6,
              7, 8, 9]
 
 
 def show_board(board):
     """ This prints the board """
-    print "\n\n     |     |     "
-    print " ", board[0], " | ", board[1], " | ", board[2], " "
-    print "-----+-----+-----" 
-    print " ", board[3], " | ", board[4], " | ", board[5], " "
-    print "-----+-----+-----"  
-    print " ", board[6], " | ", board[7], " | ", board[8], " "
-    print "     |     |     "
+    return ("```  {}  |  {}  |  {}\n".format(board[0], board[1], board[2]) +
+            "-----+-----+-----\n" +
+            "  {}  |  {}  |  {}\n".format(board[3], board[4], board[5]) +
+            "-----+-----+-----\n" +
+            "  {}  |  {}  |  {}```".format(board[6], board[7], board[8])
+            )
+    # print "\n\n     |     |     "
+    # print " ", board[0], " | ", board[1], " | ", board[2], " "
+    # print "-----+-----+-----" 
+    # print " ", board[3], " | ", board[4], " | ", board[5], " "
+    # print "-----+-----+-----"  
+    # print " ", board[6], " | ", board[7], " | ", board[8], " "
+    # print "     |     |     "
 
 
 def get_user_input():
@@ -108,5 +143,5 @@ def play_again():
 
 
 
-
-play_tictactoe()
+if __name__ == "__main__":
+    app.run(debug=True)
