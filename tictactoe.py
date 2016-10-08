@@ -1,12 +1,20 @@
 import os
 from flask import Flask, request, Response
 from slackclient import SlackClient
+from pprint import pprint
 app = Flask(__name__)
 
 SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
 SLACK_TEST_TOKEN = os.environ.get('SLACK_TEST_TOKEN')
 SLACK_SLASH_TOKEN = os.environ.get('SLACK_SLASH_TOKEN')
+SC = SlackClient(SLACK_TEST_TOKEN)
 
+# to do to get 1 game going in 1 channel:
+# figure out how to make a game object with the following attributes:
+    
+# make a function to parse the incoming text to find the first username and return it
+# make a function to manage the dictionary to remember the game's history
+# edit the code so that it adds to the history, loads the current board and checks for winner 
 
 @app.route('/slack', methods=['POST'])
 def inbound():
@@ -15,22 +23,37 @@ def inbound():
         channel = request.form.get('channel_name')
         username = request.form.get('user_name')
         text = request.form.get('text')
-        inbound_message = username + " in " + channel + " says: " + text
-        print(inbound_message)
-        test_chatmsg(channel, username)
-    return show_board(get_new_board())
+        player2 = get_second_player(text, channel)
+        if player2 == None:
+            msg = "There is an error. Please check your request for typos. :/"
+            SC.api_call("chat.postMessage", as_user='false', channel=channel, text=msg)
+        test_chatmsg(channel)
+    return text + " and " + username + " are playing tictactoe in " + channel
 
+    # if I call a bunch of functions here, will there be an error? Synchronous processes?
 
-@app.route('/', methods=['GET'])
-def test():
-    return Response('It works!')
-
-
-def test_chatmsg(channel, username):
-    sc = SlackClient(SLACK_TEST_TOKEN)
+def test_chatmsg(channel):
+    """ testing to see if board shows up on Slack channel """
     msg = show_board(get_new_board())
-    return sc.api_call("chat.postMessage", as_user='false', channel=channel, text=msg)
+    return SC.api_call("chat.postMessage", as_user='false', channel=channel, text=msg)
 
+def get_all_users():
+    """ Gets all the users in the team, including Slackbot. """
+    list_of_users = []
+    dict_users = SC.api_call("users.list") # 
+    dict_members = dict_users["members"]
+    for each in dict_members:
+        list_of_users.append(each["name"])
+    return list_of_users
+
+
+def get_second_player(text, channel):
+    text = text.split()
+    for word in text:
+        if word in get_all_users():
+            return word
+        else:
+             return None
 
 
 def play_tictactoe():
@@ -56,12 +79,12 @@ def play_tictactoe():
    
     if move_count == max_turns:        
         print "This is a draw."
-    play_again()
+    # play_again() #uncomment this line if want the option of asking to play again
 
 
 def get_new_board():
     """ Sets up a new board for 1 game """
-    return  [1, "X", 3,
+    return  [1, 2, 3,
              4, 5, 6,
              7, 8, 9]
 
@@ -74,13 +97,6 @@ def show_board(board):
             "-----+-----+-----\n" +
             "  {}  |  {}  |  {}```".format(board[6], board[7], board[8])
             )
-    # print "\n\n     |     |     "
-    # print " ", board[0], " | ", board[1], " | ", board[2], " "
-    # print "-----+-----+-----" 
-    # print " ", board[3], " | ", board[4], " | ", board[5], " "
-    # print "-----+-----+-----"  
-    # print " ", board[6], " | ", board[7], " | ", board[8], " "
-    # print "     |     |     "
 
 
 def get_user_input():
@@ -132,14 +148,14 @@ def is_winner(symbol, board):
         else:
             continue
 
-
-def play_again():
-    """Asks players if they want to play again"""
-    answer = raw_input("Would you like to play again? \n Y for yes > ")
-    if (answer.lower() == "y" or answer.lower() == "yes"):
-        play_tictactoe()
-    else:
-        print "Thank you for playing!" 
+# if want to play again, uncomment the section below
+# def play_again():
+#     """Asks players if they want to play again"""
+#     answer = raw_input("Would you like to play again? \n Y for yes > ")
+#     if (answer.lower() == "y" or answer.lower() == "yes"):
+#         play_tictactoe()
+#     else:
+#         print "Thank you for playing!" 
 
 
 
