@@ -202,13 +202,13 @@ def end_game(channel):
 
 def display_help(response_url):
     """ Posts to the channel helpful information about the game """
-    msg = "-XOXO- TicTacToe Help -XOXO-"
+    msg = "-XOXO- TicTacToe Help -XOXO- \n"
     attch = ("Slash commands:\n /ttt gamehelp: displays this help session" +
              "\n /ttt gamestatus: displays the current board and players" +
              "\n /ttt @username: starts a new game in this channel" +
              "\n /ttt endtttgame: ends the current game" +
              "\n /ttt #: # = number on the board. Current player whose turn" +
-             + "it is, makes a move")
+             "it is, makes a move")
     post_game_msg(msg, response_url, attch)
 
 
@@ -216,7 +216,8 @@ def display_game_status(Current_Game, response_url):
     """ Posts to the channel the status of current game """
     msg = ("There is an ongoing game between " +
            Current_Game.player1 + " and " + Current_Game.player2 +
-           " in this channel. \n" + Current_Game.get_formatted_board())
+           " in this channel. \n" + Current_Game.get_formatted_board() +
+           "\n It is " + Current_Game.current_player() + "'s turn.")
     post_game_msg(msg, response_url)
 
 

@@ -25,9 +25,9 @@ class TTT_Game(object):
         """ Switches turn. If move_count is odd, user1's turn. If move_count is 
             even, user2's turn. """
         if self.turn_count % 2 != 0:
-            return "X"
+            return "<X>"
         else: 
-            return "O"
+            return "(O)"
 
     def current_player(self):
         """ Keeps track of current player. """
