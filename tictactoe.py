@@ -54,7 +54,7 @@ def checks_text_content(text, player1, channel, response_url):
         placement_num = check_if_valid_move(text, response_url)
         if argument is None and placement_num is None:
         # checks to see if we have a second player or a valid move
-            msg = "I don't understand. Please enter /ttt help for more info."
+            msg = "I don't understand. Please enter /ttt gamehelp for more info."
             post_game_msg(msg, response_url)
         else:
             if is_game_in_channel(channel) is True:
@@ -62,14 +62,14 @@ def checks_text_content(text, player1, channel, response_url):
                 if isinstance(placement_num, int) and player1 == ALL_CHANNELS[channel].current_player():
                     continue_game(ALL_CHANNELS[channel], placement_num, response_url, channel)
                     # making sure that only the current player whose turn it is can make a move
-                else:
+                elif isinstance(placement_num, int):
                     msg = "Your move to make, this is not."
                     post_game_msg(msg, response_url)
                     msg = (ALL_CHANNELS[channel].current_player() +
                            ", it's your turn. Your symbol is " +
                            ALL_CHANNELS[channel].current_symbol())
                     post_game_msg(msg, response_url)
-                if argument == "endtttgame":
+                elif argument == "endtttgame":
                     # any user can end a current game
                     end_game(channel)
                     msg = player1 + " has ended the current game."
@@ -82,6 +82,7 @@ def checks_text_content(text, player1, channel, response_url):
                     # if someone tries to start a new game
                     msg = "There is already a game ongoing in this channel."
                     post_game_msg(msg, response_url)
+
             else:  # if there isn't a game currently ongoing in the channel
                 if isinstance(placement_num, int) or argument == "tttstatus":
                     msg = "Currently, there isn't a game in this channel"
