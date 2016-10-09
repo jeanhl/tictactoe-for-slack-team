@@ -47,7 +47,7 @@ def checks_text_content(text, player1, channel, response_url):
         If valid user: Make a new game
         If integer: Make next move """
     if len(text) == 0:  # checks to see if the text is empty
-        msg = "Doesn't seem like there is anything here :/"
+        msg = "Doesn't seem like there is anything there :/"
         post_game_msg(msg, response_url)
     else:
         argument = get_argument(text)
@@ -66,10 +66,7 @@ def checks_text_content(text, player1, channel, response_url):
                     else:
                         msg = "Your move to make, this is not."
                         post_game_msg(msg, response_url)
-                        msg = (ALL_CHANNELS[channel].current_player() +
-                               ", it's your turn. Your symbol is *" +
-                               ALL_CHANNELS[channel].current_symbol()) + "*"
-                        post_game_msg(msg, response_url)
+                        display_current_player(ALL_CHANNELS[channel], response_url)
                 elif argument == "endtttgame":
                     # any user can end a current game
                     end_game(channel)
@@ -152,10 +149,7 @@ def start_new_game(channel, player1, player2, response_url):
            + player2 + " to a game of tictactoe in channel: " + channel + "!\n"
            + ALL_CHANNELS[channel].get_formatted_board())
     post_game_msg(msg, response_url)
-    msg = (ALL_CHANNELS[channel].current_player() +
-           ", it's your turn. Your symbol is *" +
-           ALL_CHANNELS[channel].current_symbol()) + "*"
-    post_game_msg(msg, response_url)
+    display_current_player(ALL_CHANNELS[channel], response_url)
 
 
 def continue_game(Current_Game, placement_num, response_url, channel):
@@ -171,17 +165,11 @@ def continue_game(Current_Game, placement_num, response_url, channel):
         Current_Game.turn_count += 1
         if Current_Game.turn_count == Current_Game.max_turns:
             return game_draw(response_url, channel)
-        msg = (Current_Game.current_player() +
-               ", it's your turn. Your symbol is *" +
-               Current_Game.current_symbol()) + "#"
-        post_game_msg(msg, response_url)
+        display_current_player(Current_Game, response_url)
     elif isinstance(Current_Game.board[placement_num], str):
         msg = "That spot is already taken"
         post_game_msg(msg, response_url)
-        msg = (Current_Game.current_player() +
-               ", it's your turn. Your symbol is *" +
-               Current_Game.current_symbol()) + "*"
-        post_game_msg(msg, response_url)
+        display_current_player(Current_Game, response_url)
     else:
         msg = "Error in the input"
         post_game_msg(msg, response_url)
@@ -199,6 +187,14 @@ def game_draw(response_url, channel):
 def end_game(channel):
     """ Deletes the game after it ends """
     ALL_CHANNELS.pop(channel)
+
+
+def display_current_player(Current_Game, response_url):
+    """ Posts to channel the current player and symbol. """
+    msg = (Current_Game.current_player() +
+           ", it's your turn. Your symbol is *" +
+           Current_Game.current_symbol()) + "*"
+    post_game_msg(msg, response_url)
 
 
 def display_help(response_url):
