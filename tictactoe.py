@@ -67,8 +67,8 @@ def checks_text_content(text, player1, channel, response_url):
                         msg = "Your move to make, this is not."
                         post_game_msg(msg, response_url)
                         msg = (ALL_CHANNELS[channel].current_player() +
-                               ", it's your turn. Your symbol is " +
-                               ALL_CHANNELS[channel].current_symbol())
+                               ", it's your turn. Your symbol is *" +
+                               ALL_CHANNELS[channel].current_symbol()) + "*"
                         post_game_msg(msg, response_url)
                 elif argument == "endtttgame":
                     # any user can end a current game
@@ -92,7 +92,6 @@ def checks_text_content(text, player1, channel, response_url):
                     msg = "Currently, there isn't a game in this channel"
                     post_game_msg(msg, response_url)
                 else:
-                # isinstance(argument, str) and argument != "tttstatus":  FIXIT FIXIT
                     player2 = argument
                     start_new_game(channel, player1, player2, response_url)
 
@@ -108,15 +107,15 @@ def get_all_users():
 
 
 def get_argument(text):
-    """ Checks if the user requested in the team """
+    """ Refine user inputs into one of five possible arguments """
     text = text.split()
     if text[0].startswith("@") and text[0][1:] in get_all_users():
         return text[0][1:]
-    elif text[0] == "endtttgame":
+    elif text[0] == "endgame":
         return "endtttgame"
-    elif text[0] == "gamehelp":
+    elif text[0] == "help":
         return "ttthelp"
-    elif text[0] == "gamestatus":
+    elif text[0] == "status":
         return "tttstatus"
     else:
         return None
@@ -153,8 +152,8 @@ def start_new_game(channel, player1, player2, response_url):
            + ALL_CHANNELS[channel].get_formatted_board())
     post_game_msg(msg, response_url)
     msg = (ALL_CHANNELS[channel].current_player() +
-           ", it's your turn. Your symbol is " +
-           ALL_CHANNELS[channel].current_symbol())
+           ", it's your turn. Your symbol is *" +
+           ALL_CHANNELS[channel].current_symbol()) + "*"
     post_game_msg(msg, response_url)
 
 
@@ -172,15 +171,15 @@ def continue_game(Current_Game, placement_num, response_url, channel):
         if Current_Game.turn_count == Current_Game.max_turns:
             return game_draw(response_url, channel)
         msg = (Current_Game.current_player() +
-               ", it's your turn. Your symbol is " +
-               Current_Game.current_symbol())
+               ", it's your turn. Your symbol is *" +
+               Current_Game.current_symbol()) + "#"
         post_game_msg(msg, response_url)
     elif isinstance(Current_Game.board[placement_num], str):
         msg = "That spot is already taken"
         post_game_msg(msg, response_url)
         msg = (Current_Game.current_player() +
-               ", it's your turn. Your symbol is " +
-               Current_Game.current_symbol())
+               ", it's your turn. Your symbol is *" +
+               Current_Game.current_symbol()) + "*"
         post_game_msg(msg, response_url)
     else:
         msg = "Error in the input"
@@ -204,10 +203,10 @@ def end_game(channel):
 def display_help(response_url):
     """ Posts to the channel helpful information about the game """
     msg = "-XOXO- TicTacToe Help -XOXO- \n"
-    attch = ("Slash commands:\n /ttt gamehelp: displays this help session" +
-             "\n /ttt gamestatus: displays the current board and players" +
+    attch = ("Slash commands:\n /ttt help: displays this help session" +
+             "\n /ttt status: displays the current board and players" +
              "\n /ttt @username: starts a new game in this channel" +
-             "\n /ttt endtttgame: ends the current game" +
+             "\n /ttt endgame: ends the current game" +
              "\n /ttt #: # = number on the board. Current player whose turn " +
              "it is, makes a move")
     post_game_msg(msg, response_url, attch)
