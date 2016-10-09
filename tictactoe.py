@@ -127,8 +127,8 @@ def check_if_valid_move(text, response_url=None):
     except ValueError:
         return None
     else:
-        if 1 <= int(placement_num) <= 9:
-            return (int(placement_num)-1)
+        if 1 <= placement_num <= 9:
+            return (placement_num-1)
         else:
             msg = "There is no such spot on the board here, sport."
             post_game_msg(msg, response_url)
