@@ -41,29 +41,30 @@ def checks_text_content(text, player1, channel, response_url):
         If valid user: Make a new game
         If integer: Make next move """
     if len(text) == 0:
-        print "len = 0"
         msg = "Doesn't seem like there is anything here :/"
         post_game_msg(msg, response_url)
     else:
-        print "len not 0"
         player2 = get_second_player(text)
-        placement_num = check_if_valid_move(text)
+        placement_num = check_if_valid_move(text, response_url)
         if player2 is None and placement_num is None:
-            print "bad input"
             msg = "I don't understand. Please check your request for typos."
             post_game_msg(msg, response_url)
         else:
             if check_for_game_in_channel(channel) is True:
-                print "has a game"
-                if isinstance(placement_num, int):
+                if isinstance(placement_num, int) and player1 == ALL_CHANNELS[channel].current_player():
                     print "make a move"
                     continue_game(ALL_CHANNELS[channel], placement_num, response_url, channel)
+                else:
+                    msg = "Your decision to make, this move is not"
+                    post_game_msg(msg, response_url)
+                    msg = (ALL_CHANNELS[channel].current_player() +
+                           ", it's your turn. Your symbol is " +
+                           ALL_CHANNELS[channel].current_symbol())
+                    post_game_msg(msg, response_url)
                 if isinstance(player2, str):
-                    print "already has game"
                     msg = "There is already a game ongoing in this channel."
                     post_game_msg(msg, response_url)
             else:
-                print "no game"
                 if isinstance(placement_num, int):
                     "tried to make amove"
                     msg = "You are not currently in a game in this channel."
@@ -95,13 +96,14 @@ def check_if_valid_move(text, response_url=None):
     text = text.split()
     try:
         placement_num = int(text[0])
-        if 1 <= int(placement_num) <= 9:
-            return (int(placement_num)-1)
-        else:
-            msg = "That spot is not on the board."
-            post_game_msg(msg, response_url)
     except ValueError:
         return None
+    if 1 <= int(placement_num) <= 9:
+            return (int(placement_num)-1)
+    else:
+        msg = "There is no such spot on the board here, sport."
+        post_game_msg(msg, response_url)
+        return True
 
 
 def check_for_game_in_channel(channel):
@@ -116,9 +118,12 @@ def start_new_game(channel, player1, player2, response_url):
     """ Initiates a new game oject and announces a new game in the channel """
     ALL_CHANNELS[channel] = TTT_Game(channel, player1, player2)
     msg = ("~~~ WELCOME TO TIC TAC TOE!!! ~~~\n" + player1 + " has challenged " 
-            + player2 + " to a game of tictactoe in channel: " + channel + "!")
-    post_game_msg(msg, response_url, ALL_CHANNELS[channel].get_formatted_board())
-    msg = ALL_CHANNELS[channel].current_player() + ", it's your turn."
+            + player2 + " to a game of tictactoe in channel: " + channel + "!\n" 
+            + ALL_CHANNELS[channel].get_formatted_board())
+    post_game_msg(msg, response_url)
+    msg = (ALL_CHANNELS[channel].current_player() + 
+           ", it's your turn. Your symbol is " +
+           ALL_CHANNELS[channel].current_symbol())
     post_game_msg(msg, response_url)
 
 
@@ -129,28 +134,38 @@ def continue_game(Current_Game, placement_num, response_url, channel):
 
 def play_tictactoe(Current_Game, placement_num, response_url, channel):
     """ Runs the tic tac toe game specific to the channel """
-    print "in play tictactoe", placement_num
-    if Current_Game.turn_count < Current_Game.max_turns:
-        if isinstance(Current_Game.board[placement_num], int):
-            Current_Game.board[placement_num] = Current_Game.current_symbol()
-            post_game_msg("symbol places", response_url, Current_Game.get_formatted_board())
-            if Current_Game.is_winner(Current_Game.current_symbol()) is True:
-                msg = "We have a winner!!"
-                post_game_msg(msg, response_url, Current_Game.get_formatted_board())
-                return end_game(channel)
-            Current_Game.turn_count += 1
-            msg = Current_Game.current_player() + ", it's your turn."
+    if isinstance(Current_Game.board[placement_num], int):
+        Current_Game.board[placement_num] = Current_Game.current_symbol()
+        post_game_msg(Current_Game.get_formatted_board(), response_url)
+        if Current_Game.is_winner(Current_Game.current_symbol()) is True:
+            msg = ("~~~~~~~ We have a winner!! Tic Tac Toe champion is: "
+                    + Current_Game.current_player() + "~~~~~~~")
             post_game_msg(msg, response_url)
-        elif isinstance(Current_Game.board[placement_num], str):
-            msg = "That spot is already taken"
-            post_game_msg(msg, response_url, Current_Game.get_formatted_board())
-        else:
-            msg = "Error in the input"
-            post_game_msg(msg, response_url)
-    if Current_Game.turn_count == Current_Game.max_turns:
-        msg = "This is a draw."
+            return end_game(channel)
+        Current_Game.turn_count += 1
+        if Current_Game.turn_count == Current_Game.max_turns:
+            return game_draw(response_url, channel)
+        msg = (Current_Game.current_player() +
+               ", it's your turn. Your symbol is " +
+               Current_Game.current_symbol())
         post_game_msg(msg, response_url)
-        end_game(channel)
+    elif isinstance(Current_Game.board[placement_num], str):
+        msg = "That spot is already taken"
+        post_game_msg(msg, response_url)
+        msg = (Current_Game.current_player() +
+               ", it's your turn. Your symbol is " +
+               Current_Game.current_symbol())
+        post_game_msg(msg, response_url)
+    else:
+        msg = "Error in the input"
+        post_game_msg(msg, response_url)
+
+def game_draw(response_url, channel):
+    """ Game ended in a draw. """
+    msg = "This is a draw."
+    post_game_msg(msg, response_url)
+    end_game(channel)
+
 
 def end_game(channel):
     """ Deletes the game after it ends """

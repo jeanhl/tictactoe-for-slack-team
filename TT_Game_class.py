@@ -13,11 +13,11 @@ class TTT_Game(object):
 
     def get_formatted_board(self):
         """ Returns the board in the tictactoe format """
-        return ("    {}  |  {}  |  {}\n".format(self.board[0], self.board[1], self.board[2]) +
+        return ("```  {}  |  {}  |  {}\n".format(self.board[0], self.board[1], self.board[2]) +
             "-----+-----+-----\n" +
             "  {}  |  {}  |  {}\n".format(self.board[3], self.board[4], self.board[5]) +
             "-----+-----+-----\n" +
-            "    {}  |  {}  |  {}".format(self.board[6], self.board[7], self.board[8])
+            "  {}  |  {}  |  {}```".format(self.board[6], self.board[7], self.board[8])
             )
 
 
