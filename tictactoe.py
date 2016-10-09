@@ -14,6 +14,11 @@ SC = SlackClient(SLACK_TEST_TOKEN)
 
 ALL_CHANNELS = {} #dictionary to keep track of all the game objects
 
+@app.route('/')
+def homepage():
+    """ Shows a homepage on Heroku for debugging purposes"""
+    return "TicTacToe is running."
+
 @app.route('/slack', methods=['POST'])
 def inbound():
     """ Manages requests from the Slack channel"""
