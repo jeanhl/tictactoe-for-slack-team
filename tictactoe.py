@@ -54,7 +54,7 @@ def checks_text_content(text, player1, channel, response_url):
         placement_num = check_if_valid_move(text, response_url)
         if argument is None and placement_num is None:
         # checks to see if we have a second player or a valid move
-            msg = "I don't understand. Please enter /ttt gamehelp for more info."
+            msg = "I don't understand. Please enter /ttt help for more info."
             post_game_msg(msg, response_url)
         else:
             if is_game_in_channel(channel) is True:
@@ -89,7 +89,8 @@ def checks_text_content(text, player1, channel, response_url):
                     display_help(response_url)
                 elif (isinstance(placement_num, int) or argument == "tttstatus"
                       or argument == "endtttgame"):
-                    msg = "Currently, there isn't a game in this channel"
+                    msg = ("No game in this channel.\n" +
+                           " Start a new game with */ttt @username*")
                     post_game_msg(msg, response_url)
                 else:
                     player2 = argument
@@ -202,7 +203,7 @@ def end_game(channel):
 
 def display_help(response_url):
     """ Posts to the channel helpful information about the game """
-    msg = "-XOXO- TicTacToe Help -XOXO- \n"
+    msg = "*-XOXO- TicTacToe Help -XOXO-* \n"
     attch = ("Slash commands:\n /ttt help: displays this help session" +
              "\n /ttt status: displays the current board and players" +
              "\n /ttt @username: starts a new game in this channel" +

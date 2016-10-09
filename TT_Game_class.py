@@ -19,7 +19,7 @@ class TTT_Game(object):
                 "  {}  |  {}  |  {}```".format(self.prettify(self.board[6]), self.prettify(self.board[7]), self.prettify(self.board[8]))
                 )
 
-    def prettify(content):
+    def prettify(self, content):
         """ Returns nicer board placements """
         if isinstance(content, int):
             return " " + content + " "
