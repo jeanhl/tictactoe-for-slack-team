@@ -127,12 +127,12 @@ def check_if_valid_move(text, response_url=None):
     except ValueError:
         return None
     else:
-        if 1 <= placement_num <= 9:
-            return (placement_num-1)
-        else:
+        if 1 > placement_num or 9 < placement_num:
             msg = "There is no such spot on the board here, sport."
             post_game_msg(msg, response_url)
-            return True
+            return "Nothing"
+        else:
+            return placement_num-1
 
 
 def is_game_in_channel(channel):
