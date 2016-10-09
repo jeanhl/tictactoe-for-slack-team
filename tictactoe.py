@@ -5,7 +5,7 @@ from flask import Flask, request, Response, jsonify
 from slackclient import SlackClient
 from TT_Game_class import TTT_Game
 app = Flask(__name__)
-app.secret_key = "SLACKCODINGEXERCISE"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "SLACKCODINGEXERCISE")
 
 SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
 SLACK_TEST_TOKEN = os.environ.get('SLACK_TEST_TOKEN')
