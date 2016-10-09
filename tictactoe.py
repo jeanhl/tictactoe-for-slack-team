@@ -87,7 +87,8 @@ def checks_text_content(text, player1, channel, response_url):
             else:  # if there isn't a game currently ongoing in the channel
                 if argument == "ttthelp":
                     display_help(response_url)
-                elif isinstance(placement_num, int) or argument == "tttstatus":
+                elif (isinstance(placement_num, int) or argument == "tttstatus"
+                      or argument == "endtttgame"):
                     msg = "Currently, there isn't a game in this channel"
                     post_game_msg(msg, response_url)
                 else:
