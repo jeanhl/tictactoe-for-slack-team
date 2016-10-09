@@ -207,7 +207,7 @@ def display_help(response_url):
              "\n /ttt gamestatus: displays the current board and players" +
              "\n /ttt @username: starts a new game in this channel" +
              "\n /ttt endtttgame: ends the current game" +
-             "\n /ttt #: # = number on the board. Current player whose turn" +
+             "\n /ttt #: # = number on the board. Current player whose turn " +
              "it is, makes a move")
     post_game_msg(msg, response_url, attch)
 
