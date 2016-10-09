@@ -5,6 +5,7 @@ from flask import Flask, request, Response, jsonify
 from slackclient import SlackClient
 from TT_Game_class import TTT_Game
 app = Flask(__name__)
+app.secret_key = "SLACKCODINGEXERCISE"
 
 SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
 SLACK_TEST_TOKEN = os.environ.get('SLACK_TEST_TOKEN')
@@ -174,4 +175,5 @@ def end_game(channel):
 
 
 if __name__ == "__main__":
-    app.run()
+    PORT = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=PORT)
