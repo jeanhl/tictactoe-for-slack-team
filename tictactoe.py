@@ -132,7 +132,7 @@ def check_if_valid_move(text, response_url=None):
         else:
             msg = "There is no such spot on the board here, sport."
             post_game_msg(msg, response_url)
-            return "Nothing"
+            return True
 
 
 def is_game_in_channel(channel):
