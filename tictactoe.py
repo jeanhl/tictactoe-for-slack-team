@@ -126,18 +126,17 @@ def check_if_valid_move(text, response_url=None):
         placement_num = int(text[0])
     except ValueError:
         return None
-    if 1 <= int(placement_num) <= 9:
-            return (int(placement_num)-1)
     else:
-        msg = "There is no such spot on the board here, sport."
-        post_game_msg(msg, response_url)
-        return False
+        if 1 <= int(placement_num) <= 9:
+            return (int(placement_num)-1)
+        else:
+            msg = "There is no such spot on the board here, sport."
+            post_game_msg(msg, response_url)
+            return "Nothing"
 
 
 def is_game_in_channel(channel):
     """ Checks to see if there is an ongoing game in the channel. """
-    print "channel", channel
-    print "ALL_CHANNELS", ALL_CHANNELS
     if channel in ALL_CHANNELS:
         return True
 
@@ -145,7 +144,7 @@ def is_game_in_channel(channel):
 def start_new_game(channel, player1, player2, response_url):
     """ Initiates a new game oject and announces a new game in the channel """
     ALL_CHANNELS[channel] = TTT_Game(channel, player1, player2)
-    msg = ("~~~ WELCOME TO TIC TAC TOE!!! ~~~\n" + player1 + " has challenged "
+    msg = ("*~~~ WELCOME TO TIC TAC TOE!!! ~~~*\n" + player1 + " has challenged "
            + player2 + " to a game of tictactoe in channel: " + channel + "!\n"
            + ALL_CHANNELS[channel].get_formatted_board())
     post_game_msg(msg, response_url)
