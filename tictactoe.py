@@ -59,16 +59,17 @@ def checks_text_content(text, player1, channel, response_url):
         else:
             if is_game_in_channel(channel) is True:
             # if there is an ongoing game in the channel, the following can happen
-                if isinstance(placement_num, int) and player1 == ALL_CHANNELS[channel].current_player():
-                    continue_game(ALL_CHANNELS[channel], placement_num, response_url, channel)
+                if isinstance(placement_num, int):
+                    if player1 == ALL_CHANNELS[channel].current_player():
                     # making sure that only the current player whose turn it is can make a move
-                elif isinstance(placement_num, int):
-                    msg = "Your move to make, this is not."
-                    post_game_msg(msg, response_url)
-                    msg = (ALL_CHANNELS[channel].current_player() +
-                           ", it's your turn. Your symbol is " +
-                           ALL_CHANNELS[channel].current_symbol())
-                    post_game_msg(msg, response_url)
+                        continue_game(ALL_CHANNELS[channel], placement_num, response_url, channel)
+                    else:
+                        msg = "Your move to make, this is not."
+                        post_game_msg(msg, response_url)
+                        msg = (ALL_CHANNELS[channel].current_player() +
+                               ", it's your turn. Your symbol is " +
+                               ALL_CHANNELS[channel].current_symbol())
+                        post_game_msg(msg, response_url)
                 elif argument == "endtttgame":
                     # any user can end a current game
                     end_game(channel)
