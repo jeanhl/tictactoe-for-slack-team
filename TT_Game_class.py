@@ -22,7 +22,7 @@ class TTT_Game(object):
     def prettify(self, content):
         """ Returns nicer board placements """
         if isinstance(content, int):
-            return " " + content + " "
+            return " {} ".format(content)
         elif content == "X":
             return "<X>"
         elif content == "O":
