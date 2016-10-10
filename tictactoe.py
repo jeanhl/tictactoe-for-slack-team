@@ -3,7 +3,7 @@ import requests
 import json
 from flask import Flask, request
 from slackclient import SlackClient
-from TT_Game_class import TTT_Game
+from TTT_Game_class import TTT_Game
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "SLACKCODINGEXERCISE")
 
@@ -43,7 +43,7 @@ def post_to_slack(msg, response_url, attachment=None):
 
 
 def private_post_to_slack(msg, response_url, attachment=None):
-    """ Posts game msgs to Slack that can only be seen by the user calling the 
+    """ Posts game msgs to Slack that can only be seen by the user calling the
         slash command """
     files = {"content-type": "application/json"}
     chunk = {"text": msg,
@@ -69,21 +69,21 @@ def process_text_content(text, username, channel, response_url):
         placement_num = get_valid_placement(text)
 
         # if the word is none of the above, check to see if it is a command
-        text = text.split()
+        command = get_command(text)
         # a username is a command to start a new game
-        if text[0].startswith("@"):
+        if command == "start new game":
             start_new_game(channel, username, target_username, response_url)
         # command to end a game that anyone can do
-        elif text[0] == "endgame":
+        elif command == "endgame":
             manual_end(username, channel, response_url)
         # command to show the help info that anyone can do
-        elif text[0] == "help":
+        elif command == "help":
             display_help(response_url)
         # command to show the game status that anyone can do
-        elif text[0] == "status":
+        elif command == "status":
             determine_game_status(channel, response_url)
         # an integer is a command to start a new game
-        elif is_text_integer(text[0]):
+        elif command == "proceed to next move":
             validate_and_make_move(username, channel, placement_num, response_url)
         # the text entered isn't a command or username or move
         else:
@@ -174,6 +174,28 @@ def make_move(Current_Game, placement_num, response_url, channel):
         post_to_slack(msg, response_url)
 
 
+def get_command(text):
+    """ Returns a command """
+    text = text.split()
+    # a username is a command to start a new game
+    if text[0].startswith("@"):
+        return "start new game"
+    # command to end a game that anyone can do
+    elif text[0] == "endgame":
+        return "endgame"
+    # command to show the help info that anyone can do
+    elif text[0] == "help":
+        return "help"
+    # command to show the game status that anyone can do
+    elif text[0] == "status":
+        return "status"
+    # an integer is a command to start a new game
+    elif is_text_integer(text[0]):
+        return "proceed to next move"
+    else:
+        return None
+
+
 def get_all_users():
     """ Gets all the users in the team, including Slackbot. """
     list_of_users = []
@@ -200,7 +222,7 @@ def get_valid_placement(text):
         if 1 <= placement_num <= 9:
             return placement_num-1
         else:
-            return 10000 
+            return 10000
     else:
         return None
 
@@ -208,7 +230,7 @@ def get_valid_placement(text):
 def is_text_integer(text):
     """ Checks if a string can be converted to an interger """
     try:
-        int(text[0])
+        int(text)
     except ValueError:
         return False
     return True
