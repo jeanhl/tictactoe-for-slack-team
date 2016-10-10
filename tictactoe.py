@@ -42,13 +42,22 @@ def post_to_slack(msg, response_url, attachment=None):
     requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
 
 
+def private_post_to_slack(msg, response_url, attachment=None):
+    """ Posts game msgs to Slack that can only be seen by the user calling the 
+        slash command """
+    files = {"content-type": "application/json"}
+    chunk = {"text": msg,
+             "attachments": [{"text": attachment}]}
+    requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
+
+
 def process_text_content(text, username, channel, response_url):
     """ Processed the text input for different commands or just invalid inputs and
         calls the appropriate functions """
     # checks to see if the text is empty
     if len(text) == 0:
         msg = "Doesn't seem like there is anything there :/"
-        post_to_slack(msg, response_url)
+        private_post_to_slack(msg, response_url)
 
     # text is not empty. Take the first word in the text and process it
     else:
@@ -79,7 +88,7 @@ def process_text_content(text, username, channel, response_url):
         # the text entered isn't a command or username or move
         else:
             msg = "I don't understand. Please enter */ttt help* for more info."
-            post_to_slack(msg, response_url)
+            private_post_to_slack(msg, response_url)
 
 
 def start_new_game(channel, player1, player2, response_url):
@@ -89,12 +98,12 @@ def start_new_game(channel, player1, player2, response_url):
     # checks if there is already an existing game in the channel
     if is_game_in_channel(channel):
         msg = "There is already a game ongoing in this channel."
-        post_to_slack(msg, response_url)
+        private_post_to_slack(msg, response_url)
 
     # checks to see if player2 is a valid game partner
     elif player2 is None:
         msg = "That person is not part of this team."
-        post_to_slack(msg, response_url)
+        private_post_to_slack(msg, response_url)
 
     # there is no game in the channel, a new one can start
     else:
@@ -117,9 +126,8 @@ def validate_and_make_move(username, channel, placement_num, response_url):
 
             # Check 3: when current player tries to play a location not on the board
             if placement_num == 10000:
-                msg = "There is no such spot on the board here, sport."
-                post_to_slack(msg, response_url)
-                display_current_player(ALL_GAMES[channel], response_url)
+                msg = ("There is no such spot on the board here, sport.")
+                private_post_to_slack(msg, response_url)
 
             # all requirements are fulfilled, the game can proceed
             else:
@@ -128,8 +136,7 @@ def validate_and_make_move(username, channel, placement_num, response_url):
         # someone not current player tried to make a move
         else:
             msg = "Your move to make, this is not."
-            post_to_slack(msg, response_url)
-            display_current_player(ALL_GAMES[channel], response_url)
+            private_post_to_slack(msg, response_url)
 
     # there is no game currently in the channel
     else:
@@ -141,7 +148,6 @@ def make_move(Current_Game, placement_num, response_url, channel):
     # if the spot is an interger, it is an available spot
     if isinstance(Current_Game.board[placement_num], int):
         Current_Game.board[placement_num] = Current_Game.current_symbol()
-        Current_Game.turn_count += 1
         post_to_slack(Current_Game.get_formatted_board(), response_url)
 
         # checks if the move results in a winner
@@ -149,6 +155,7 @@ def make_move(Current_Game, placement_num, response_url, channel):
             game_win(response_url, channel)
             return None
 
+        Current_Game.turn_count += 1
         # checks if the game is at a draw
         if Current_Game.turn_count == Current_Game.max_turns:
             game_draw(response_url, channel)
@@ -159,12 +166,11 @@ def make_move(Current_Game, placement_num, response_url, channel):
     # if the spot is a string ( X or O ), it is not available
     elif isinstance(Current_Game.board[placement_num], str):
         msg = "That spot is already taken"
-        post_to_slack(msg, response_url)
-        display_current_player(Current_Game, response_url)
+        private_post_to_slack(msg, response_url)
 
     # something went wrong
     else:
-        msg = "Error in the input"
+        msg = "Error in the input. Please contact the game admin"
         post_to_slack(msg, response_url)
 
 
@@ -235,7 +241,7 @@ def manual_end(username, channel, response_url):
     """ checks to see if there is an ongoing game. If yes, ends it """
     # if there is a game ongoing, ends it and displays who ended it
     if is_game_in_channel(channel):
-        msg = username + " has ended the current game."
+        msg = "^.^ ^.^ " + username + " has ended the current game. ^.^ ^.^"
         post_to_slack(msg, response_url)
         end_game(channel)
 
@@ -266,7 +272,7 @@ def display_help(response_url):
              "\n /ttt endgame: ends the current game" +
              "\n /ttt #: # = number on the board. Current player whose turn " +
              "it is, makes a move")
-    post_to_slack(msg, response_url, attch)
+    private_post_to_slack(msg, response_url, attch)
 
 
 def determine_game_status(channel, response_url):
@@ -277,7 +283,7 @@ def determine_game_status(channel, response_url):
                ALL_GAMES[channel].player1 + " and " + ALL_GAMES[channel].player2 +
                " in this channel. \n" + ALL_GAMES[channel].get_formatted_board() +
                "\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
-        post_to_slack(msg, response_url)
+        private_post_to_slack(msg, response_url)
 
     # if no game, says so
     else:
@@ -287,7 +293,7 @@ def determine_game_status(channel, response_url):
 def display_no_game(response_url):
     """ displays a message that there is no ongoing game in the Slack channel """
     msg = "No game in this channel.\n Start a new game with */ttt @username*"
-    post_to_slack(msg, response_url)
+    private_post_to_slack(msg, response_url)
 
 
 if __name__ == "__main__":
