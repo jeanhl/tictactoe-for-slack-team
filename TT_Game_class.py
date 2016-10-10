@@ -3,8 +3,8 @@ class TTT_Game(object):
     def __init__(self, player1, player2):
         self.player1 = player1
         self.player2 = player2
-        self.turn_count = 1
-        self.max_turns = 10
+        self.turn_count = 1  # keep track of game progress
+        self.max_turns = 10  # to check for a draw
         self.board = [1, 2, 3,
                       4, 5, 6,
                       7, 8, 9]

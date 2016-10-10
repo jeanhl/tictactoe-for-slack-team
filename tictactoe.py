@@ -43,10 +43,10 @@ def post_to_slack(msg, response_url, attachment=None):
 
 
 def process_text_content(text, username, channel, response_url):
-    """ Processed the text input for different commands or just invalid inputs and 
+    """ Processed the text input for different commands or just invalid inputs and
         calls the appropriate functions """
     # checks to see if the text is empty
-    if len(text) == 0:  
+    if len(text) == 0:
         msg = "Doesn't seem like there is anything there :/"
         post_to_slack(msg, response_url)
 
@@ -58,12 +58,12 @@ def process_text_content(text, username, channel, response_url):
         # checks if the first word is a number on the board. If yes, get it
         # If none, gets None
         placement_num = get_valid_placement(text)
-        
+
         # if the word is none of the above, check to see if it is a command
         text = text.split()
         # a username is a command to start a new game
         if text[0].startswith("@"):
-            start_new_game(channel, username,target_username,response_url)
+            start_new_game(channel, username, target_username, response_url)
         # command to end a game that anyone can do
         elif text[0] == "endgame":
             manual_end(username, channel, response_url)
@@ -83,7 +83,7 @@ def process_text_content(text, username, channel, response_url):
 
 
 def start_new_game(channel, player1, player2, response_url):
-    """ Initiates a new game oject if possible and 
+    """ Initiates a new game oject if possible and
         announces a new game in the channel """
 
     # checks if there is already an existing game in the channel
@@ -186,9 +186,6 @@ def get_target_username(text):
         return None
 
 
-
-
-
 def get_valid_placement(text):
     """ Gets the location on the board for the next move, if any """
     text = text.split()
@@ -197,7 +194,7 @@ def get_valid_placement(text):
         if 1 <= placement_num <= 9:
             return placement_num-1
         else:
-            return 10000
+            return 10000 
     else:
         return None
 
@@ -215,9 +212,6 @@ def is_game_in_channel(channel):
     """ Checks to see if there is an ongoing game in the channel. """
     if channel in ALL_GAMES:
         return True
-
-
-
 
 
 def game_win(response_url, channel):
@@ -239,10 +233,13 @@ def game_draw(response_url, channel):
 
 def manual_end(username, channel, response_url):
     """ checks to see if there is an ongoing game. If yes, ends it """
+    # if there is a game ongoing, ends it and displays who ended it
     if is_game_in_channel(channel):
         msg = username + " has ended the current game."
         post_to_slack(msg, response_url)
         end_game(channel)
+
+    # if no game, then there is no game to end
     else:
         display_no_game(response_url)
 
@@ -274,12 +271,15 @@ def display_help(response_url):
 
 def determine_game_status(channel, response_url):
     """ checks to see if there is an ongoing game. If yes, displays the current status """
+    # if there is a game ongoing, displays the game status
     if is_game_in_channel(channel):
         msg = ("There is an ongoing game between " +
                ALL_GAMES[channel].player1 + " and " + ALL_GAMES[channel].player2 +
                " in this channel. \n" + ALL_GAMES[channel].get_formatted_board() +
                "\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
         post_to_slack(msg, response_url)
+
+    # if no game, says so
     else:
         display_no_game(response_url)
 
