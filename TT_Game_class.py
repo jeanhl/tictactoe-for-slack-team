@@ -1,7 +1,6 @@
 class TTT_Game(object):
 
-    def __init__(self, channel, player1, player2):
-        self.channel = channel
+    def __init__(self, player1, player2):
         self.player1 = player1
         self.player2 = player2
         self.turn_count = 1
@@ -59,7 +58,6 @@ class TTT_Game(object):
             if (self.board[win[0]] == symbol and
                 self.board[win[1]] == symbol and
                 self.board[win[2]] == symbol):
-                print "Game ends with a winner"
                 return True
             else:
                 continue
