@@ -15,6 +15,7 @@ SC = SlackClient(SLACK_TEST_TOKEN)
 ALL_GAMES = {}  # dictionary to keep track of all the game objects
 
 
+##### Flask routes #####
 @app.route('/')
 def homepage():
     """ Shows a homepage on Heroku for debugging purposes"""
@@ -33,24 +34,7 @@ def inbound():
         return " "
 
 
-def post_to_slack(msg, response_url, attachment=None):
-    """ Posts game msgs to Slack """
-    files = {"content-type": "application/json"}
-    chunk = {"response_type": "in_channel",
-             "text": msg,
-             "attachments": [{"text": attachment}]}
-    requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
-
-
-def private_post_to_slack(msg, response_url, attachment=None):
-    """ Posts game msgs to Slack that can only be seen by the user calling the
-        slash command """
-    files = {"content-type": "application/json"}
-    chunk = {"text": msg,
-             "attachments": [{"text": attachment}]}
-    requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
-
-
+#####  Processing and validating inputs #####
 def process_text_content(text, username, channel, response_url):
     """ Processed the text input for different commands or just invalid inputs and
         calls the appropriate functions """
@@ -89,89 +73,6 @@ def process_text_content(text, username, channel, response_url):
         else:
             msg = "I don't understand. Please enter */ttt help* for more info."
             private_post_to_slack(msg, response_url)
-
-
-def start_new_game(channel, player1, player2, response_url):
-    """ Initiates a new game oject if possible and
-        announces a new game in the channel """
-
-    # checks if there is already an existing game in the channel
-    if is_game_in_channel(channel):
-        msg = "There is already a game ongoing in this channel."
-        private_post_to_slack(msg, response_url)
-
-    # checks to see if player2 is a valid game partner
-    elif player2 is None:
-        msg = "That person is not part of this team."
-        private_post_to_slack(msg, response_url)
-
-    # there is no game in the channel, a new one can start
-    else:
-        ALL_GAMES[channel] = TTT_Game(player1, player2)  # adding a new game object
-        msg = ("*~~~ WELCOME TO TIC TAC TOE!!! ~~~*\n" + player1 + " has challenged "
-               + player2 + " to a game of tictactoe in channel: " + channel + "!\n"
-               + ALL_GAMES[channel].get_formatted_board())
-        post_to_slack(msg, response_url)
-        display_current_player(ALL_GAMES[channel], response_url)
-
-
-def validate_and_make_move(username, channel, placement_num, response_url):
-    """ Checks all the requirements for there to be a valid move and makes it
-        if possible. """
-    # Check 1: making sure that the game exists
-    if is_game_in_channel(channel):
-
-        # Check 2: making sure that only the current player whose turn it is can make a move
-        if username == ALL_GAMES[channel].current_player():
-
-            # Check 3: when current player tries to play a location not on the board
-            if placement_num == 10000:
-                msg = ("There is no such spot on the board here, sport.")
-                private_post_to_slack(msg, response_url)
-
-            # all requirements are fulfilled, the game can proceed
-            else:
-                make_move(ALL_GAMES[channel], placement_num, response_url, channel)
-
-        # someone not current player tried to make a move
-        else:
-            msg = "Your move to make, this is not."
-            private_post_to_slack(msg, response_url)
-
-    # there is no game currently in the channel
-    else:
-        display_no_game(response_url)
-
-
-def make_move(Current_Game, placement_num, response_url, channel):
-    """ Runs the tic tac toe game specific to the channel """
-    # if the spot is an interger, it is an available spot
-    if isinstance(Current_Game.board[placement_num], int):
-        Current_Game.board[placement_num] = Current_Game.current_symbol()
-        post_to_slack(Current_Game.get_formatted_board(), response_url)
-
-        # checks if the move results in a winner
-        if Current_Game.is_winner(Current_Game.current_symbol()) is True:
-            game_win(response_url, channel)
-            return None
-
-        Current_Game.turn_count += 1
-        # checks if the game is at a draw
-        if Current_Game.turn_count == Current_Game.max_turns:
-            game_draw(response_url, channel)
-            return None
-
-        display_current_player(Current_Game, response_url)
-
-    # if the spot is a string ( X or O ), it is not available
-    elif isinstance(Current_Game.board[placement_num], str):
-        msg = "That spot is already taken"
-        private_post_to_slack(msg, response_url)
-
-    # something went wrong
-    else:
-        msg = "Error in the input. Please contact the game admin"
-        post_to_slack(msg, response_url)
 
 
 def get_command(text):
@@ -242,6 +143,108 @@ def is_game_in_channel(channel):
         return True
 
 
+#####  Starts, continues or manually ends games #####
+def start_new_game(channel, player1, player2, response_url):
+    """ Initiates a new game oject if possible and
+        announces a new game in the channel """
+
+    # checks if there is already an existing game in the channel
+    if is_game_in_channel(channel):
+        msg = "There is already a game ongoing in this channel."
+        private_post_to_slack(msg, response_url)
+
+    # checks to see if player2 is a valid game partner
+    elif player2 is None:
+        msg = "That person is not part of this team."
+        private_post_to_slack(msg, response_url)
+
+    # checks to see if player2 Slackbot
+    elif player2 == "slackbot":
+        display_not_slackbot(response_url)
+
+    # there is no game in the channel, a new one can start
+    else:
+        ALL_GAMES[channel] = TTT_Game(player1, player2)  # adding a new game object
+        msg = ("*~~~ WELCOME TO TIC TAC TOE!!! ~~~*\n" + player1 + " has challenged "
+               + player2 + " to a game of tictactoe in channel: " + channel + "!\n"
+               + ALL_GAMES[channel].get_formatted_board())
+        post_to_slack(msg, response_url)
+        display_current_player(ALL_GAMES[channel], response_url)
+
+
+def validate_and_make_move(username, channel, placement_num, response_url):
+    """ Checks all the requirements for there to be a valid move and makes it
+        if possible. """
+    # Check 1: making sure that the game exists
+    if is_game_in_channel(channel):
+
+        # Check 2: making sure that only the current player whose turn it is can make a move
+        if username == ALL_GAMES[channel].current_player():
+
+            # Check 3: when current player tries to play a location not on the board
+            if placement_num == 10000:
+                msg = ("There is no such spot on the board here, sport.")
+                private_post_to_slack(msg, response_url)
+
+            # all requirements are fulfilled, the game can proceed
+            else:
+                make_move(ALL_GAMES[channel], placement_num, response_url, channel)
+
+        # someone not current player tried to make a move
+        else:
+            msg = "Your move to make, this is not."
+            private_post_to_slack(msg, response_url)
+
+    # there is no game currently in the channel
+    else:
+        display_no_game(response_url)
+
+
+def manual_end(username, channel, response_url):
+    """ checks to see if there is an ongoing game. If yes, ends it """
+    # if there is a game ongoing, ends it and displays who ended it
+    if is_game_in_channel(channel):
+        msg = "^.^ ^.^ " + username + " has ended the current game. ^.^ ^.^"
+        post_to_slack(msg, response_url)
+        end_game(channel)
+
+    # if no game, then there is no game to end
+    else:
+        display_no_game(response_url)
+
+
+#####  Game logic #####
+def make_move(Current_Game, placement_num, response_url, channel):
+    """ Runs the tic tac toe game specific to the channel """
+    # if the spot is an interger, it is an available spot
+    if isinstance(Current_Game.board[placement_num], int):
+        Current_Game.board[placement_num] = Current_Game.current_symbol()
+        post_to_slack(Current_Game.get_formatted_board(), response_url)
+
+        # checks if the move results in a winner
+        if Current_Game.is_winner(Current_Game.current_symbol()) is True:
+            game_win(response_url, channel)
+            return None
+
+        Current_Game.turn_count += 1
+        # checks if the game is at a draw
+        if Current_Game.turn_count == Current_Game.max_turns:
+            game_draw(response_url, channel)
+            return None
+
+        display_current_player(Current_Game, response_url)
+
+    # if the spot is a string ( X or O ), it is not available
+    elif isinstance(Current_Game.board[placement_num], str):
+        msg = "That spot is already taken"
+        private_post_to_slack(msg, response_url)
+
+    # something went wrong
+    else:
+        msg = "Error in the game. Please contact the game admin"
+        post_to_slack(msg, response_url)
+
+
 def game_win(response_url, channel):
     """ Game ended with a winner. """
     msg = ("~~~~~~~ We have a winner!! Tic Tac Toe champion is: "
@@ -259,24 +262,12 @@ def game_draw(response_url, channel):
     end_game(channel)
 
 
-def manual_end(username, channel, response_url):
-    """ checks to see if there is an ongoing game. If yes, ends it """
-    # if there is a game ongoing, ends it and displays who ended it
-    if is_game_in_channel(channel):
-        msg = "^.^ ^.^ " + username + " has ended the current game. ^.^ ^.^"
-        post_to_slack(msg, response_url)
-        end_game(channel)
-
-    # if no game, then there is no game to end
-    else:
-        display_no_game(response_url)
-
-
 def end_game(channel):
     """ Deletes the game after it ends """
     ALL_GAMES.pop(channel)
 
 
+#####  Display messages #####
 def display_current_player(Current_Game, response_url):
     """ Posts to channel the current player and symbol. """
     msg = (Current_Game.current_player() +
@@ -312,10 +303,36 @@ def determine_game_status(channel, response_url):
         display_no_game(response_url)
 
 
+def display_not_slackbot(response_url):
+    """ displays a message that the user cannot play with Slackbot :( """
+    msg = ("Sorry, but Slackbot is currently too busy to play tictactoe" +
+           " with you. Try asking someone else with */ttt @nonSlackbotusername*.")
+    private_post_to_slack(msg, response_url)
+
+
 def display_no_game(response_url):
     """ displays a message that there is no ongoing game in the Slack channel """
     msg = "No game in this channel.\n Start a new game with */ttt @username*"
     private_post_to_slack(msg, response_url)
+
+
+#####  Posting messages to Slack via response_url #####
+def post_to_slack(msg, response_url, attachment=None):
+    """ Posts game msgs to Slack """
+    files = {"content-type": "application/json"}
+    chunk = {"response_type": "in_channel",
+             "text": msg,
+             "attachments": [{"text": attachment}]}
+    requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
+
+
+def private_post_to_slack(msg, response_url, attachment=None):
+    """ Posts game msgs to Slack that can only be seen by the user calling the
+        slash command """
+    files = {"content-type": "application/json"}
+    chunk = {"text": msg,
+             "attachments": [{"text": attachment}]}
+    requests.request("POST", response_url, data=json.dumps(chunk), headers=files)
 
 
 if __name__ == "__main__":
