@@ -99,27 +99,21 @@ class GameClassUnitTestCase(unittest.TestCase):
             symbols with the decorations"""
         TestGame = TTT_Game("John", "Jane")
         self.assertEqual(TestGame.get_formatted_board(),
-                        ("```  1  |  2  |  3 \n" +
-                         "-----+-----+-----\n" +
-                         "  4  |  5  |  6 \n" +
-                         "-----+-----+-----\n" +
-                         "  7  |  8  |  9 ```"))
+                        (":one::two::three:\n" +
+                         ":four::five::six:\n" +
+                         ":seven::eight::nine:"))
 
         TestGame.board = [1, 2, "O", 4, "X", 6, 7, 8, 9]
         self.assertEqual(TestGame.get_formatted_board(),
-                        ("```  1  |  2  | (O)\n" +
-                         "-----+-----+-----\n" +
-                         "  4  | <X> |  6 \n" +
-                         "-----+-----+-----\n" +
-                         "  7  |  8  |  9 ```"))
+                        (":one::two::o:\n" +
+                         ":four::heavy_multiplication_x::six:\n" +
+                         ":seven::eight::nine:"))
 
         TestGame.board = ["O", "O", "O", "O", "O", "O", "O", "O", "O"]
         self.assertEqual(TestGame.get_formatted_board(),
-                        ("``` (O) | (O) | (O)\n" +
-                         "-----+-----+-----\n" +
-                         " (O) | (O) | (O)\n" +
-                         "-----+-----+-----\n" +
-                         " (O) | (O) | (O)```"))
+                        (":o::o::o:\n" +
+                         ":o::o::o:\n" +
+                         ":o::o::o:"))
 
     def test_current_symbol(self):
         """ Making sure the correct symbols are returned

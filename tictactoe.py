@@ -40,7 +40,7 @@ def process_text_content(text, username, channel, response_url):
         calls the appropriate functions """
     # checks to see if the text is empty
     if len(text) == 0:
-        msg = "Doesn't seem like there is anything there :/"
+        msg = "Doesn't seem like there is anything there :thinking_face:"
         private_post_to_slack(msg, response_url)
 
     # text is not empty. Take the first word in the text and process it
@@ -71,7 +71,7 @@ def process_text_content(text, username, channel, response_url):
             validate_and_make_move(username, channel, placement_num, response_url)
         # the text entered isn't a command or username or move
         else:
-            msg = "I don't understand. Please enter */ttt help* for more info."
+            msg = "I don't understand. :sweat_smile: Please enter */ttt help* for more info."
             private_post_to_slack(msg, response_url)
 
 
@@ -150,12 +150,12 @@ def start_new_game(channel, player1, player2, response_url):
 
     # checks if there is already an existing game in the channel
     if is_game_in_channel(channel):
-        msg = "There is already a game ongoing in this channel."
+        msg = ":dizzy: There is already a game ongoing in this channel. :dizzy:"
         private_post_to_slack(msg, response_url)
 
     # checks to see if player2 is a valid game partner
     elif player2 is None:
-        msg = "That person is not part of this team."
+        msg = "That person is not part of this team. :no_mouth:" 
         private_post_to_slack(msg, response_url)
 
     # checks to see if player2 Slackbot
@@ -165,8 +165,9 @@ def start_new_game(channel, player1, player2, response_url):
     # there is no game in the channel, a new one can start
     else:
         ALL_GAMES[channel] = TTT_Game(player1, player2)  # adding a new game object
-        msg = ("*~~~ WELCOME TO TIC TAC TOE!!! ~~~*\n" + player1 + " has challenged "
-               + player2 + " to a game of tictactoe in channel: " + channel + "!\n"
+        msg = (":sparkles::dizzy::zap: WELCOME TO TIC TAC TOE!!! :zap::dizzy::sparkles:\n*"
+               + player1 + "* has challenged *" + player2 +
+               "* to a game of tictactoe in channel: " + channel + "!\n"
                + ALL_GAMES[channel].get_formatted_board())
         post_to_slack(msg, response_url)
         display_current_player(ALL_GAMES[channel], response_url)
@@ -183,7 +184,7 @@ def validate_and_make_move(username, channel, placement_num, response_url):
 
             # Check 3: when current player tries to play a location not on the board
             if placement_num == 10000:
-                msg = ("There is no such spot on the board here, sport.")
+                msg = ("There is no such spot on the board here, sport. :dart:")
                 private_post_to_slack(msg, response_url)
 
             # all requirements are fulfilled, the game can proceed
@@ -192,7 +193,7 @@ def validate_and_make_move(username, channel, placement_num, response_url):
 
         # someone not current player tried to make a move
         else:
-            msg = "Your move to make, this is not."
+            msg = ":space_invader: Your move to make, this is not. :space_invader:"
             private_post_to_slack(msg, response_url)
 
     # there is no game currently in the channel
@@ -204,7 +205,8 @@ def manual_end(username, channel, response_url):
     """ checks to see if there is an ongoing game. If yes, ends it """
     # if there is a game ongoing, ends it and displays who ended it
     if is_game_in_channel(channel):
-        msg = "^.^ ^.^ " + username + " has ended the current game. ^.^ ^.^"
+        msg = (":ghost::skull_and_crossbones::ghost: " + username +
+               " has ended the current game. :ghost::skull_and_crossbones::ghost:")
         post_to_slack(msg, response_url)
         end_game(channel)
 
@@ -236,7 +238,7 @@ def make_move(Current_Game, placement_num, response_url, channel):
 
     # if the spot is a string ( X or O ), it is not available
     elif isinstance(Current_Game.board[placement_num], str):
-        msg = "That spot is already taken"
+        msg = ":8ball: That spot is already taken. Pick a different one :8ball:"
         private_post_to_slack(msg, response_url)
 
     # something went wrong
@@ -247,17 +249,18 @@ def make_move(Current_Game, placement_num, response_url, channel):
 
 def game_win(response_url, channel):
     """ Game ended with a winner. """
-    msg = ("~~~~~~~ We have a winner!! Tic Tac Toe champion is: "
-           + ALL_GAMES[channel].current_player() + "~~~~~~~")
+    msg = (":beers::confetti_ball::tada::sports_medal: We have a winner!! " +
+           "Tic Tac Toe champion is: *" + ALL_GAMES[channel].current_player() +
+           "* :medal::tada::confetti_ball::beers:")
     post_to_slack(msg, response_url)
     end_game(channel)
 
 
 def game_draw(response_url, channel):
     """ Game ended in a draw. """
-    msg = (ALL_GAMES[channel].player1 +
-           " and " + ALL_GAMES[channel].player2 +
-           " draw on this game.")
+    msg = ":dancers: *" + (ALL_GAMES[channel].player1 +
+          "* and *" + ALL_GAMES[channel].player2 +
+          "* draw on this game. :dancers:")
     post_to_slack(msg, response_url)
     end_game(channel)
 
@@ -272,19 +275,21 @@ def display_current_player(Current_Game, response_url):
     """ Posts to channel the current player and symbol. """
     msg = (Current_Game.current_player() +
            ", it's your turn. Your symbol is *" +
-           Current_Game.current_symbol()) + "*"
+           Current_Game.current_symbol() + "*. Pick a number " +
+           "to place your symbol. Like this: */ttt 1*")
     post_to_slack(msg, response_url)
 
 
 def display_help(response_url):
     """ Posts to the channel helpful information about the game """
-    msg = "*-XOXO- TicTacToe Help -XOXO-* \n"
+    msg = (":heavy_multiplication_x::o::heavy_multiplication_x::o: " +
+           "TicTacToe Help :o::heavy_multiplication_x::o::heavy_multiplication_x:\n")
     attch = ("Slash commands:\n /ttt help: displays this help session" +
-             "\n /ttt status: displays the current board and players" +
-             "\n /ttt @username: starts a new game in this channel" +
-             "\n /ttt endgame: ends the current game" +
+             "\n /ttt status: displays the current board and players :hash:" +
+             "\n /ttt @username: starts a new game in this channel :sparkles:" +
+             "\n /ttt endgame: ends the current game :skull:" +
              "\n /ttt #: # = number on the board. Current player whose turn " +
-             "it is, makes a move")
+             "it is, makes a move :two:")
     private_post_to_slack(msg, response_url, attch)
 
 
@@ -292,10 +297,10 @@ def determine_game_status(channel, response_url):
     """ checks to see if there is an ongoing game. If yes, displays the current status """
     # if there is a game ongoing, displays the game status
     if is_game_in_channel(channel):
-        msg = ("There is an ongoing game between " +
-               ALL_GAMES[channel].player1 + " and " + ALL_GAMES[channel].player2 +
+        msg = ("There is an ongoing game between :sunglasses:*" +
+               ALL_GAMES[channel].player1 + "* and :smirk_cat:*" + ALL_GAMES[channel].player2 +
                " in this channel. \n" + ALL_GAMES[channel].get_formatted_board() +
-               "\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
+               "*\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
         private_post_to_slack(msg, response_url)
 
     # if no game, says so
@@ -305,14 +310,15 @@ def determine_game_status(channel, response_url):
 
 def display_not_slackbot(response_url):
     """ displays a message that the user cannot play with Slackbot :( """
-    msg = ("Sorry, but Slackbot is currently too busy to play tictactoe" +
-           " with you. Try asking someone else with */ttt @nonSlackbotusername*.")
+    msg = ("Sorry, but :robot_face:Slackbot:robot_face: is currently too busy to " +
+           " play tictactoe with you. Try asking someone else with " +
+           "*/ttt @nonSlackbotusername*.")
     private_post_to_slack(msg, response_url)
 
 
 def display_no_game(response_url):
     """ displays a message that there is no ongoing game in the Slack channel """
-    msg = "No game in this channel.\n Start a new game with */ttt @username*"
+    msg = "No game in this channel.:v:\n Start a new game with */ttt @username* :ok_hand:"
     private_post_to_slack(msg, response_url)
 
 

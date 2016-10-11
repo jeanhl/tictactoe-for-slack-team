@@ -15,31 +15,33 @@ class TTT_Game(object):
 
     def get_formatted_board(self):
         """ Returns the board in the tictactoe format """
-        return ("``` {} | {} | {}\n".format(self.prettify(self.board[0]),
-                                            self.prettify(self.board[1]),
-                                            self.prettify(self.board[2])) +
-                "-----+-----+-----\n" +
-                " {} | {} | {}\n".format(self.prettify(self.board[3]),
-                                         self.prettify(self.board[4]),
-                                         self.prettify(self.board[5])) +
-                "-----+-----+-----\n" +
-                " {} | {} | {}```".format(self.prettify(self.board[6]),
-                                          self.prettify(self.board[7]),
-                                          self.prettify(self.board[8]))
+        return ("{}{}{}\n".format(self.prettify(self.board[0]),
+                                  self.prettify(self.board[1]),
+                                  self.prettify(self.board[2])) +
+                "{}{}{}\n".format(self.prettify(self.board[3]),
+                                  self.prettify(self.board[4]),
+                                  self.prettify(self.board[5])) +
+                "{}{}{}".format(self.prettify(self.board[6]),
+                                self.prettify(self.board[7]),
+                                self.prettify(self.board[8]))
                 )
 
     def prettify(self, content):
         """ Returns nicer board placements """
         # this helps players distinguish between the numbers,
         # Xs and Os on the board.
-        if isinstance(content, int):
-            return " {} ".format(content)
-        elif content == "X":
-            return "<X>"
-        elif content == "O":
-            return "(O)"
-        else:
-            return content
+        emojis = {1: ":one:",
+                  2: ":two:",
+                  3: ":three:",
+                  4: ":four:",
+                  5: ":five:",
+                  6: ":six:",
+                  7: ":seven:",
+                  8: ":eight:",
+                  9: ":nine:",
+                  "X": ":heavy_multiplication_x:",
+                  "O": ":o:"}
+        return emojis[content]
 
     def current_player(self):
         """ Switches turn. If move_count is odd, user1's turn.
