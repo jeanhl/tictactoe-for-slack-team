@@ -299,8 +299,8 @@ def determine_game_status(channel, response_url):
     if is_game_in_channel(channel):
         msg = ("There is an ongoing game between :sunglasses:*" +
                ALL_GAMES[channel].player1 + "* and :smirk_cat:*" + ALL_GAMES[channel].player2 +
-               " in this channel. \n" + ALL_GAMES[channel].get_formatted_board() +
-               "*\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
+               "* in this channel. \n" + ALL_GAMES[channel].get_formatted_board() +
+               "\n It is " + ALL_GAMES[channel].current_player() + "'s turn.")
         private_post_to_slack(msg, response_url)
 
     # if no game, says so
