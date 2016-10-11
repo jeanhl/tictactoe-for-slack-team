@@ -19,7 +19,7 @@ ALL_GAMES = {}  # dictionary to keep track of all the game objects
 @app.route('/')
 def homepage():
     """ Shows a homepage on Heroku for debugging purposes"""
-    return "TicTacToe is running."  # displayed on the homepage
+    return "Tic-Tac-Toe is running."  # displayed on the homepage
 
 
 @app.route('/slack', methods=['POST'])
@@ -165,9 +165,9 @@ def start_new_game(channel, player1, player2, response_url):
     # there is no game in the channel, a new one can start
     else:
         ALL_GAMES[channel] = TTT_Game(player1, player2)  # adding a new game object
-        msg = (":sparkles::dizzy::zap: WELCOME TO TIC TAC TOE!!! :zap::dizzy::sparkles:\n*"
+        msg = (":sparkles::dizzy::zap: WELCOME TO TIC-TAC-TOE!!! :zap::dizzy::sparkles:\n*"
                + player1 + "* has challenged *" + player2 +
-               "* to a game of tictactoe in channel: " + channel + "!\n"
+               "* to a game of tic-tac-toe in channel: " + channel + "!\n"
                + ALL_GAMES[channel].get_formatted_board())
         post_to_slack(msg, response_url)
         display_current_player(ALL_GAMES[channel], response_url)
@@ -217,7 +217,7 @@ def manual_end(username, channel, response_url):
 
 #####  Game logic #####
 def make_move(Current_Game, placement_num, response_url, channel):
-    """ Runs the tic tac toe game specific to the channel """
+    """ Runs the tic-tac-toe game specific to the channel """
     # if the spot is an interger, it is an available spot
     if isinstance(Current_Game.board[placement_num], int):
         Current_Game.board[placement_num] = Current_Game.current_symbol()
@@ -250,7 +250,7 @@ def make_move(Current_Game, placement_num, response_url, channel):
 def game_win(response_url, channel):
     """ Game ended with a winner. """
     msg = (":beers::confetti_ball::tada::sports_medal: We have a winner!! " +
-           "Tic Tac Toe champion is: *" + ALL_GAMES[channel].current_player() +
+           "Tic-Tac-Toe champion is: *" + ALL_GAMES[channel].current_player() +
            "* :medal::tada::confetti_ball::beers:")
     post_to_slack(msg, response_url)
     end_game(channel)
@@ -283,13 +283,14 @@ def display_current_player(Current_Game, response_url):
 def display_help(response_url):
     """ Posts to the channel helpful information about the game """
     msg = (":heavy_multiplication_x::o::heavy_multiplication_x::o: " +
-           "TicTacToe Help :o::heavy_multiplication_x::o::heavy_multiplication_x:\n")
-    attch = ("Slash commands:\n /ttt help: displays this help session" +
+           "Tic-Tac-Toe Help :o::heavy_multiplication_x::o::heavy_multiplication_x:\n")
+    attch = ("Slash commands:\n /ttt help: displays this help session :rotating_light:" +
              "\n /ttt status: displays the current board and players :hash:" +
              "\n /ttt @username: starts a new game in this channel :sparkles:" +
              "\n /ttt endgame: ends the current game :skull:" +
              "\n /ttt #: # = number on the board. Current player whose turn " +
-             "it is, makes a move :two:")
+             "it is, makes a move :two:\n For more information about tic-tac-toe, " +
+             "please visit https://en.wikipedia.org/wiki/Tic-tac-toe :scroll:")
     private_post_to_slack(msg, response_url, attch)
 
 
@@ -311,7 +312,7 @@ def determine_game_status(channel, response_url):
 def display_not_slackbot(response_url):
     """ displays a message that the user cannot play with Slackbot :( """
     msg = ("Sorry, but :robot_face:Slackbot:robot_face: is currently too busy to " +
-           " play tictactoe with you. Try asking someone else with " +
+           " play tic-tac-toe with you. Try asking someone else with " +
            "*/ttt @nonSlackbotusername*.")
     private_post_to_slack(msg, response_url)
 
