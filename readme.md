@@ -18,33 +18,33 @@ All commands are preceded by "/ttt ". Only the first whole word is taken into ac
             play the game including the two current players.
             
 When starting a game, you should get this:<br/>
-![Starting a game]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png) 
+<kbd>![Starting a game]
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png)</kbd>
 
 
 
 Taking turns:<br/>
-![Next turn]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/Next%20turn%20TTT.png)
+<kbd>![Next turn]
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Next%20turn%20TTT.png)</kbd>
 
 
 
 Winner, winner, chicken dinner!! <br/>
-![Winner of the game]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/Winner%20TTT.png)
+<kbd>![Winner of the game]
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Winner%20TTT.png)</kbd>
 
 
 
 Draw!<br/>
-![Game Draw]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/Draw.png)
+<kbd>![Game Draw]
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Draw.png)</kbd>
 
 
 
 
 Manual/Custom commands will result in a status message like this:<br/>
-![Ending a game]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/End%20TTT.png)
+<kbd>![Ending a game]
+(https://dl.dropboxusercontent.com/u/4440990/TTT/End%20TTT.png)</kbd>
 
 
 For more information about tic-tac-toe, please visit:
