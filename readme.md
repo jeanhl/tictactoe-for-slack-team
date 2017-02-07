@@ -42,7 +42,7 @@ Draw!<br/>
 
 
 
-Manual/Custom commands will result in a status message like this:
+Manual/Custom commands will result in a status message like this:<br/>
 ![Ending a game]
 (https://dl.dropboxusercontent.com/u/4440990/TTT/End%20TTT.png)
 
