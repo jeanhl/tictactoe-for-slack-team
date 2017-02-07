@@ -19,7 +19,7 @@ All commands are preceded by "/ttt ". Only the first whole word is taken into ac
             
 When starting a game, you should get this:
 
-![alt tag](https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png)
+![Alt text](https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png)
 
 
 For more information about tic-tac-toe, please visit:
