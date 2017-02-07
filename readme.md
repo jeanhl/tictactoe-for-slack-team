@@ -17,21 +17,30 @@ All commands are preceded by "/ttt ". Only the first whole word is taken into ac
 /ttt help : Anyone on the Slack team can get a help message detailing how to 
             play the game including the two current players.
             
-When starting a game, you should get this:
+When starting a game, you should get this:<br/>
 ![Starting a game]
-(https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png)
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Welcome%20TTT.png) 
 
-Taking turns:
+
+
+Taking turns:<br/>
 ![Next turn]
-(https://www.dropbox.com/home/Public/TTT?preview=Next+turn+TTT.png)
+(https://dl.dropboxusercontent.com/u/4440990/TTT/Next%20turn%20TTT.png)
 
-Winner, winner, chicken dinner!! 
+
+
+Winner, winner, chicken dinner!! <br/>
 ![Winner of the game]
 (https://dl.dropboxusercontent.com/u/4440990/TTT/Winner%20TTT.png)
 
-Draw!
+
+
+Draw!<br/>
 ![Game Draw]
 (https://dl.dropboxusercontent.com/u/4440990/TTT/Draw.png)
+
+
+
 
 Manual/Custom commands will result in a status message like this:
 ![Ending a game]
